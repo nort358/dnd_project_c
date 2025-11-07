@@ -31,7 +31,7 @@ void load_menu() {
             printf("\nAre you sure you want to permanently delete the save? [Yes/No]: ");
             char is_delete[100];
             scanf("%s", is_delete);
-            if (!((strcasecmp(is_delete, "yes")) && (strcasecmp(is_delete, "y")))) { // strcasecmp is a case-insensitive strcmp, eg "yes" == "YeS
+            if (!((strcasecmp(is_delete, "yes")) && (strcasecmp(is_delete, "y")))) { // strcasecmp is a case-insensitive strcmp, eg "yes" == "YeS"
                 printf("Saved Game #%d deleted.\n", choice);
                 load_menu(); 
             //  TODO add delete_saved_game(choice);
