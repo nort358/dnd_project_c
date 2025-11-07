@@ -12,7 +12,7 @@ void load_menu() {
     const int MAX = 3; // TODO change to actual max number of saved games
     while(scanf("%d", &choice) != 1 || choice < 1 || choice > MAX) {
         while (getchar() != '\n');
-        printf("Insert an action [1-%d]: ", MAX);
+        printf("Choose the game [1-%d]: ", MAX);
     }
     printf("\nSelect one of the following action: \n");
     printf("\n1. Load \n2. Delete \n");
