@@ -1,0 +1,25 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.fseventsd
+.Spotlight-V100
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Build outputs
+build/
+bin/
+obj/
+*.out
+*.o
+*.exe
+*.a
+*.so
+*.dylib
+*.dSYM/
+
+# Logs and temp
+*.log
+*.tmp
