@@ -9,7 +9,7 @@ void menu() {
     printf("\n\nChoose an action (1-2): ");
     int choice = 0;
     // int check_is_num = scanf("%d", &choice);
-    while(scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+    while(scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)){
         while (getchar() != '\n');
         printf("Invalid choice. Please enter 1 or 2.\n");
         // check_is_num = scanf("%d", &choice);

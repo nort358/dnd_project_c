@@ -7,7 +7,6 @@ void load_menu() {
     printf("1. Saved Game #1\n2. Saved Game #2"); // TODO load a list of actual saved games
     printf("\nSelect a game: ");
     int choice = 0;
-    scanf("%d", &choice);
     const int MAX = 2; // TODO change to actual max number of saved games
     // int check_is_num = scanf("%d", &choice);
     while(scanf("%d", &choice) != 1 || choice < 1 || choice > MAX) {
@@ -15,5 +14,5 @@ void load_menu() {
         printf("Invalid choice. Please a number less than %d\n", MAX);
         // check_is_num = scanf("%d", &choice);
     }
-    printf("Loading Saved Game #%d...\n", choice);
+    printf("\n\nLoading Saved Game #%d...\n", choice);
 }
