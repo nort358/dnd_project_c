@@ -20,13 +20,12 @@ void load_menu() {
     while(scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)){
         while (getchar() != '\n');
         printf("Choose an action [1, 2]: ");
-        // check_is_num = scanf("%d", &choice);
     }
     switch (choice) {
         case 1:
             printf("\n\nLoading Saved Game #%d...\n", choice);
             printf("\nGoing to Village\n");
-            // village_menu();
+            // TODO village_menu();
             break;
         case 2:
             printf("Are you sure you want to permanently delete the save? [Yes/No]\n");
@@ -42,7 +41,7 @@ void load_menu() {
             }
             else {
                 printf("\nReturning to Saved Games\n");
-                load_menu(); 
+                load_menu(); // go back to load menu
             }
         }
 }
