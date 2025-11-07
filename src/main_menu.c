@@ -6,11 +6,11 @@ void main_menu() {
     printf("\nInitial Game Memu\n\n\n");
     printf("1. New Game\n");
     printf("2. Load Game\n");
-    printf("\n\nChoose an action (1-2): ");
+    printf("\nChoose an action (1-2): ");
     int choice = 0;
     while(scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)){ // scanf returns the number of successfully read items. if it's not 1, the input was invalid
         while (getchar() != '\n');
-        printf("Choose an action: ");
+        printf("Choose an action (1-2): ");
     }
     switch (choice) {
         case 1:
