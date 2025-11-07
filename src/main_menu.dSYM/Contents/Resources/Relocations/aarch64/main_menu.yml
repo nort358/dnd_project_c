@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     '/Users/mariafuriosa/Dev/dungeon_generator_c/src/main_menu'
-relocations:     []
-...
