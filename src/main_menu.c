@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/load_menu.h"
+#include <hero.h>
 
 void main_menu(int cheatcode_unlocked) {
     printf("\nInitial Game Memu\n\n\n");
@@ -44,6 +45,7 @@ void main_menu(int cheatcode_unlocked) {
     switch (choice[0]) { // we can use choice[0] as we only need the first char
         case '1':
             printf("Starting a new game...\n");
+            Hero hero = {20, 0, 0, 0, 0, 0, 0, 0, 0}; // initialize a new hero 
             // TODO village_menu();
             break; // if you dont't put break here, it will continue to case 2
         case '2':
