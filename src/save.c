@@ -2,12 +2,8 @@
 #include "../include/save.h"
 #include <hero.h>
 
-typedef struct {
-    time_t timestamp;
-    Hero hero;   
-} Save;
-
-static int count_completed_missions_from_hero(const Hero *h) {
+int count_completed_missions_from_hero(const Hero *h)
+{
     int completed = 0;
     completed += (h->first_mission_completed != 0);
     completed += (h->second_mission_completed != 0);
@@ -16,14 +12,14 @@ static int count_completed_missions_from_hero(const Hero *h) {
     return completed;
 }
 
-static int count_items_from_hero(const Hero *h) {
+int count_items_from_hero(const Hero *h)
+{
     int items = 0;
     items += (h->sword != 0);
     items += (h->armor != 0);
     items += h->health_potions;
     return items;
 }
-
 
 // typedef struct SaveNode {
 //     Save save;

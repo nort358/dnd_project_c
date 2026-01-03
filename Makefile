@@ -12,7 +12,7 @@ INCLUDES := -Iinclude
 all: dirs $(TARGET)
 
 dirs:
-	@mkdir -p $(BUILD_DIR)
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: src/%.c | dirs
 	$(CC) $(CFLAGS_DEBUG) $(INCLUDES) -c $< -o $@
