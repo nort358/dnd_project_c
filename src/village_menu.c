@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../include/village_menu.h"
 #include "../include/hero.h"
-
+#include "../include/mission.h"
 void village_menu(Hero *hero)
 {
     int choice;
@@ -33,9 +33,28 @@ void village_menu(Hero *hero)
             switch (choice)
             {
             case 1:
-                printf("\nSTARTING A MISSION...\n");
-                printf("MISSION SYSTEM COMING SOON! :)\n");
+            {
+                // 1.Create mission system
+                MissionSystem mission_system;
+                mission_init(&mission_system);
+
+                // 2. Display mission menu
+                mission_display_menu(&mission_system);
+
+                // 4.Get user choice
+                int mission_choice;
+                scanf("%d", &mission_choice);
+
+                // 4.Process selection
+                int selected = mission_select(&mission_system, mission_choice);
+                if (selected >= 0)
+                {
+                    printf("\nEntering dungeon... (Dungeon system coming soon!)\n");
+                    // 5.TEMPORARY: Mark progress
+                    mission_update_progress(&mission_system, 1);
+                }
                 break;
+            }
 
             case 2:
                 printf("\nResting at the village...\n");
@@ -71,7 +90,7 @@ void village_menu(Hero *hero)
             }
         }
 
-        printf("\nPress Enter to continue...");
+        printf("\nPress Enter to continue...\n");
         getchar();
     }
 }
