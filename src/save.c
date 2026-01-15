@@ -1,80 +1,117 @@
 #include <time.h>
 #include "../include/save.h"
-#include <hero.h>
+#include "../include/hero.h"
+#include <stdio.h>
+#include <time.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include "string.h"
+#include <stdlib.h>
+char save_folder[] = "saves";
 
-int count_completed_missions_from_hero(const Hero *h)
-{
-    int completed = 0;
-    completed += (h->first_mission_completed != 0);
-    completed += (h->second_mission_completed != 0);
-    completed += (h->third_mission_completed != 0);
-    completed += (h->final_mission_unlocked != 0);
-    return completed;
+int get_save_index(char *filename){
+    int index = -1;
+    sscanf(filename, "%d.save", &index);
+    return index;
 }
 
-int count_items_from_hero(const Hero *h)
-{
-    int items = 0;
-    items += (h->sword != 0);
-    items += (h->armor != 0);
-    items += h->health_potions;
-    return items;
+int generate_new_save_idx(){
+    int save_number = 1;
+    DIR *dir = opendir(save_folder);
+    if (!dir) {
+        printf("Empty dir");
+        return -1;
+    }
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        int idx=get_save_index(entry->d_name);
+        if (idx >= save_number) {
+            save_number = idx + 1;
+        }
+    }
+    closedir(dir);
+    return save_number;
 }
 
-// typedef struct SaveNode {
-//     Save save;
-//     struct SaveNode *next;
-// } SaveNode;
+void save_game(Hero *hero){
+    mkdir(save_folder, 0755);
+    char path[256];
+    int save_idx= generate_new_save_idx();
+    snprintf(path, sizeof(path), "%s/%d.save", save_folder, save_idx);
+    FILE *file =fopen(path,"wb");
+    if (file==NULL){
+        printf("File not exists");
+        return;
+    }
+    time_t current_time = time(NULL);
+    Save save = {current_time, save_idx, *hero};
+    fwrite(&save,sizeof(save),1,file);
+    fclose(file);
+}
+void delete_save(int save_idx){
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%d.save", save_folder, save_idx);
+    printf("Deleting save file: %s\n", path);
+    remove(path);
+}
 
-// SaveNode addSave(SaveNode *head, Hero hero) {
-//     SaveNode *node = malloc(sizeof(SaveNode));
-//     if (!node) {
-//         printf("Memory allocation failed!\n");
-//         return head;
-//     }
 
-//     node->save.hero = hero;
-//     node->save.timestamp = time(NULL);
+Save load_save(char *filename)
+{
+    FILE *file =fopen(filename, "rb");
+    if (file==NULL){
+        printf("Save not exists");
+        perror("fopen");
+    }
+    Save save;
+    fread(&save,sizeof(save),1,file);
+    fclose(file);
+    return save;
+}
 
-//     node->next = NULL;
+int count_files(){
+    DIR *dir = opendir(save_folder);
+    if (!dir) {
+        return 0;
+    }
+    struct dirent *entry;
+    int n_files=0;
 
-//     if (head == NULL) {
-//         return node;
-//     }
+    while ((entry = readdir(dir)) != NULL) {
+        char *filename = entry->d_name;
+        size_t len = strlen(filename);
+        if (!(len >= 5 && strcmp(filename + len - 5, ".save") == 0)) {
+            continue;
+        }
+        n_files++;
+    }
+    closedir(dir);
+    return n_files;
+}
 
-//     // add to end of list
-//     SaveNode *cur = head;
-//     while (cur->next != NULL) {
-//         cur = cur->next;
-//     }
-//     cur->next = node;
+SaveList load_saves(){
+    Save *saves;
+    int count_saves=count_files();
+    saves= malloc (count_saves*sizeof(Save));
+    DIR *dir = opendir(save_folder);
+    if (!dir) {
+        return (SaveList){NULL, 0};
+    }
+    struct dirent *entry;
 
-//     return head;
-// }
-
-// void printSaveList(SaveNode *head) {
-//     int index = 1;
-//     SaveNode *cur = head;
-
-//     while (cur != NULL) {
-//         struct tm *t = localtime(&cur->save.timestamp);
-
-//         int completedCount = 0;
-//         for (int i = 0; i < NUM_MISSIONS; i++) {
-//             completedCount += cur->save.missions.completed[i];
-//         }
-
-//         printf("%d. %02d-%02d-%04d %02d:%02d:%02d , "
-//                "%d L. POINTS , %d COINS , %d ITEMS , %d COMPLETED MISSIONS\n",
-//                index,
-//                t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,
-//                t->tm_hour, t->tm_min, t->tm_sec,
-//                cur->save.hero.hp,
-//                cur->save.hero.coins,
-//                cur->save.hero.numItems,
-//                completedCount);
-
-//         cur = cur->next;
-//         index++;
-//     }
-// }
+    int i = 0;
+    while ((entry = readdir(dir)) != NULL) {
+        char *filename = entry->d_name;
+        size_t len = strlen(filename);
+        if (!(len >= 5 && strcmp(filename + len - 5, ".save") == 0)) {
+            continue;
+        }
+        char path[256];
+        snprintf(path, sizeof(path), "%s/%s", save_folder, filename);
+        saves[i]= load_save(path);
+        i++;
+    }
+    closedir(dir);
+    return (SaveList){saves, i};
+};

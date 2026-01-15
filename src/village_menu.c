@@ -4,6 +4,8 @@
 #include "../include/village_menu.h"
 #include "../include/hero.h"
 #include "../include/mission.h"
+#include "../include/save.h"
+
 void village_menu(Hero *hero)
 {
     int choice;
@@ -77,14 +79,16 @@ void village_menu(Hero *hero)
                 break;
 
             case 4:
-                printf("\nSaving the game...\n");
-                printf("(Save system coming soon!)\n");
+                save_game(hero);
                 break;
 
             case 5:
                 printf("\nReturning to Main Menu...\n");
                 return;
-
+            case 9:
+            hero->coins += 1000;
+            printf("\nCheat activated: Added 1000 coins!\n");
+            break;
             default:
                 printf("\nInvalid choice! Please enter 1-5\n");
             }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/load_menu.h"
-#include <hero.h>
+#include "../include/hero.h"
 #include "../include/village_menu.h"
 
 void main_menu(int cheatcode_unlocked)
@@ -25,7 +25,7 @@ void main_menu(int cheatcode_unlocked)
     while (fgets(choice, sizeof(choice), stdin))
     {                                         // fgets reads a line from stdin: fgets(variable, size of variable, source of input)
         choice[strcspn(choice, "\n")] = '\0'; // remove \n, cause fgets gets a whole line including \n
-        if (!cheatcode_unlocked && (strcmp(choice, "1") == 0) || strcmp(choice, "2") == 0)
+        if (!cheatcode_unlocked && (strcmp(choice, "1") == 0 || strcmp(choice, "2") == 0))
         { // go if cheatcode is locked. strcmp returns 0 if equal
             break;
         }
@@ -65,7 +65,7 @@ void main_menu(int cheatcode_unlocked)
         break; // if you dont't put break here, it will continue to case 2
     case '2':
         printf("Loading a saved game...\n");
-        load_menu();
+        load_menu(&hero);
         break;
     case '3':
         printf("Loading cheats...\n");
