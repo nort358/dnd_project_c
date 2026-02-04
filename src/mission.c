@@ -6,7 +6,7 @@
 void mission_init(MissionSystem *system)
 {
     // Mission 1: Rotting Swamp
-    system->missions[0].type = 1;   // 1 = Rotting Swamp
+    system->missions[0].dungeon_name = ROTTING_SWAMP;
     system->missions[0].status = 0; // 0 = it means not started yet!
     strcpy(system->missions[0].name, "Rotting Swamp");
     strcpy(system->missions[0].objective, "Kill 3 Orc Generals");
@@ -14,7 +14,7 @@ void mission_init(MissionSystem *system)
     system->missions[0].objectives_required = 3;
 
     // Mission 2: Haunted Mansion
-    system->missions[1].type = 2;
+    system->missions[1].dungeon_name = HAUNTED_MANSION;
     system->missions[1].status = 0;
     strcpy(system->missions[1].name, "Haunted Mansion");
     strcpy(system->missions[1].objective, "Get key and kill Vampire");
@@ -22,7 +22,7 @@ void mission_init(MissionSystem *system)
     system->missions[1].objectives_required = 2;
 
     // Mission 3: Crystal Cave
-    system->missions[2].type = 3;
+    system->missions[2].dungeon_name = CRYSTAL_CAVE;
     system->missions[2].status = 0;
     strcpy(system->missions[2].name, "Crystal Cave");
     strcpy(system->missions[2].objective, "Find Hero's Sword");
@@ -30,7 +30,7 @@ void mission_init(MissionSystem *system)
     system->missions[2].objectives_required = 1;
 
     // Mission 4: Dark Lord (final boss)
-    system->missions[3].type = 4;
+    system->missions[3].dungeon_name = DARK_LORD_CASTLE;
     system->missions[3].status = 0;
     strcpy(system->missions[3].name, "Dark Lord Castle");
     strcpy(system->missions[3].objective, "Beat the Dark Lord");

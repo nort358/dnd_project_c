@@ -1,5 +1,5 @@
 #include "../include/hero.h"
-
+#include <sword.h>
 void Hero_coins_change(Hero *h, int coins)
 {
     h->coins += coins;
@@ -11,8 +11,13 @@ void Hero_life_points_change(Hero *h, int life_points)
 }
 void Hero_equip_sword(Hero *h)
 {
-    h->sword = 1;
+    h->sword = SWORD;
 }
+void Hero_equip_hero_sword(Hero *h)
+{
+    h->sword = HERO_SWORD;
+}
+
 void Hero_equip_armor(Hero *h)
 {
     h->armor = 1;

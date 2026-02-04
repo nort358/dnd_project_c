@@ -1,6 +1,7 @@
 #ifndef MISSION_H
 #define MISSION_H
 #include <stdbool.h>
+#include "dungeon_name.h"
 
 typedef enum
 {
@@ -9,17 +10,10 @@ typedef enum
     MISSION_COMPLETED
 } MissionStatus;
 
-typedef enum
-{
-    MISSION_ROTTING_SWAMP = 1,
-    MISSION_HAUNTED_MANSION = 2,
-    MISSION_CRYSTAL_CAVE = 3,
-    MISSION_DARK_LORD_CASTLE = 4
-} MissionType;
 
 typedef struct
 {
-    MissionType type;
+    DUNGEON_NAME dungeon_name;
     MissionStatus status;
     char name[50];
     char objective[100];

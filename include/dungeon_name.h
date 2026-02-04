@@ -1,0 +1,7 @@
+typedef enum
+{
+    ROTTING_SWAMP = 1,
+    HAUNTED_MANSION = 2,
+    CRYSTAL_CAVE = 3,
+    DARK_LORD_CASTLE = 4
+} DUNGEON_NAME;
