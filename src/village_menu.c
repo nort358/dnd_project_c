@@ -8,6 +8,50 @@
 #include "../include/dungeon.h"
 #include "../include/dungeon_name.h"
 
+// 1 = win, 0 = hero dies:)
+int fight_enemy(Hero *h, Room *r)
+{
+    printf("\n--- FIGHT! ---\n");
+    printf("Enemy: %d (need %d+ to hit)\n", r->name, r->fatal_strike); // %d, not %s
+
+    while (h->life_points > 0)
+    {
+        int attack = rand() % 6 + 1;
+        if (h->sword)
+            attack += 1;
+
+        printf("You roll %d", attack - (h->sword ? 1 : 0));
+        if (h->sword)
+            printf(" +1 sword = %d", attack);
+        printf("\n");
+
+        if (attack >= r->fatal_strike)
+        {
+            printf("*** VICTORY! ***\n");
+            h->coins += r->reward_coins;
+            printf("You got %d coins! (now %d)\n", r->reward_coins, h->coins);
+            return 1;
+        }
+        else
+        {
+            int dmg = r->damage;
+            if (h->armor)
+                dmg -= 1;
+            if (dmg < 1)
+                dmg = 1;
+            h->life_points -= dmg;
+            printf("Enemy hits for %d damage! You have %d HP left.\n", dmg, h->life_points);
+
+            if (h->life_points <= 0)
+            {
+                printf("\n*** YOU DIED... GAME OVER ***\n");
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+
 void village_menu(Hero *hero)
 {
     int what;
@@ -34,13 +78,13 @@ void village_menu(Hero *hero)
             typed[strcspn(typed, "\n")] = 0;
             what = atoi(typed);
 
-            switch (what)
+            switch (what) // <-- braces must be here!
             {
             case 1:
             {
+                // --- Mission menu ---
                 MissionSystem missions;
                 mission_init(&missions);
-
                 mission_display_menu(&missions);
 
                 int pick;
@@ -49,51 +93,85 @@ void village_menu(Hero *hero)
                 int mission_index = mission_select(&missions, pick, hero);
                 if (mission_index >= 0)
                 {
+                    printf("\n=== ENTERING DUNGEON ===\n");
 
-                    mission_inside_menu(&missions, hero);
-
-                    hero->first_mission_completed = (missions.missions[0].status == MISSION_COMPLETED) ? 1 : 0;
-                    hero->second_mission_completed = (missions.missions[1].status == MISSION_COMPLETED) ? 1 : 0;
-                    hero->third_mission_completed = (missions.missions[2].status == MISSION_COMPLETED) ? 1 : 0;
-                    printf("\n>>> GOING INTO DUNGEON <<<\n");
-
+                    // --- Generate correct dungeon ---
                     Dungeon d;
                     if (pick == 1)
-                    {
                         d = generate_dungeon(hero, ROTTING_SWAMP);
-                        printf("Made Rotting Swamp dungeon\n");
-                    }
                     else if (pick == 2)
-                    {
                         d = generate_dungeon(hero, HAUNTED_MANSION);
-                        printf("Made Haunted Mansion dungeon\n");
-                    }
                     else if (pick == 3)
-                    {
                         d = generate_dungeon(hero, CRYSTAL_CAVE);
-                        printf("Made Crystal Cave dungeon\n");
-                    }
                     else if (pick == 4)
-                    {
                         d = generate_dungeon(hero, DARK_LORD_CASTLE);
-                        printf("Made Dark Lord Castle dungeon\n");
+
+                    printf("Dungeon has 10 rooms.\n\n");
+
+                    // --- Objective counter for Rotting Swamp ---
+                    int generals_killed = 0;
+
+                    // --- Go through each room ---
+                    for (int i = 0; i < 10; i++)
+                    {
+                        printf("--- Room %d/%d ---\n", i + 1, 10);
+                        printf("You see: %d\n", d.rooms[i].name); // %d, not %s
+
+                        // --- EMPTY ---
+                        if (d.rooms[i].type == 0)
+                        {
+                            printf("Nothing here. You move on.\n");
+                        }
+                        // --- ENEMY ---
+                        else if (d.rooms[i].type == 1)
+                        {
+                            int win = fight_enemy(hero, &d.rooms[i]);
+                            if (win == 0)
+                            {
+                                printf("\nReturning to main menu...\n");
+                                return; // hero dead → back to main menu
+                            }
+
+                            // --- Check if enemy is an Orc General ---
+                            if (d.rooms[i].name == ORC_GENERAL)
+                            {
+                                generals_killed++;
+                                printf("Orc Generals defeated: %d/3\n", generals_killed);
+
+                                if (generals_killed >= 3)
+                                {
+                                    printf("\n*********************************\n");
+                                    printf("*** ROTTING SWAMP COMPLETE! ***\n");
+                                    printf("*********************************\n");
+                                    hero->first_mission_completed = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        // --- TRAP ---
+                        else if (d.rooms[i].type == 2)
+                        {
+                            int dmg = d.rooms[i].damage;
+
+                            if (d.rooms[i].damage == 0)
+                                dmg = rand() % 6 + 1;
+
+                            hero->life_points -= dmg;
+                            printf("TRAP! You lose %d HP. (HP now %d)\n", dmg, hero->life_points);
+
+                            if (hero->life_points <= 0)
+                            {
+                                printf("\n*** YOU DIED... GAME OVER ***\n");
+                                return;
+                            }
+                        }
+
+                        printf("\nPress Enter to continue...");
+                        getchar();
+                        getchar();
                     }
 
-                    printf("Dungeon has 10 rooms.\n");
-                    printf("Room 1 is: ");
-                    if (d.rooms[0].type == 1)
-                    {
-                        printf("BAD GUY\n");
-                    }
-                    else if (d.rooms[0].type == 2)
-                    {
-                        printf("TRAP!\n");
-                    }
-                    else
-                    {
-                        printf("nothing\n");
-                    }
-
+                    printf("\nYou return to the village.\n");
                     mission_update_progress(&missions, 1);
                 }
                 break;

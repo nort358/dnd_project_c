@@ -1,6 +1,7 @@
 #include "mission.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void mission_init(MissionSystem *system)
 {
@@ -36,9 +37,9 @@ void mission_init(MissionSystem *system)
     system->missions[3].objectives_completed = 0;
     system->missions[3].objectives_required = 1;
 
-    system->current_mission = -1; // -1 means no mission active
+    system->current_mission = -1;
     system->missions_completed = 0;
-    system->final_unlocked = 0; // 0 = locked!!
+    system->final_unlocked = 0;
 }
 
 // it was buggy before
@@ -83,8 +84,9 @@ void mission_display_menu(MissionSystem *system)
 }
 
 // This function was hard , had to fix it 3 times :>!
-int mission_select(MissionSystem *system, int choice)
+int mission_select(MissionSystem *system, int choice, Hero *hero)
 {
+    (void)hero;
     if (choice == 0)
         return -1; // going back
 
@@ -104,7 +106,7 @@ int mission_select(MissionSystem *system, int choice)
     }
 
     // Start the mission
-    system->missions[idx].status = 1; // 1 = in progress
+    system->missions[idx].status = 1;
     system->current_mission = idx;
 
     printf("\n  Starting Mission   \n");
@@ -119,7 +121,7 @@ void mission_update_progress(MissionSystem *system, int add_progress)
 {
     int now = system->current_mission;
     if (now < 0)
-        return; // no active mission
+        return;
 
     // Add progress
     system->missions[now].objectives_completed += add_progress;
@@ -133,9 +135,9 @@ void mission_update_progress(MissionSystem *system, int add_progress)
         system->missions[now].objectives_required)
     {
 
-        system->missions[now].status = 2; // 2 = completed
+        system->missions[now].status = 2;
         system->missions_completed++;
-        system->current_mission = -1; // reset current mission
+        system->current_mission = -1;
 
         printf("\n*** CONGRATS! MISSION COMPLETE! ***\n");
 
@@ -145,6 +147,100 @@ void mission_update_progress(MissionSystem *system, int add_progress)
             system->final_unlocked = 1;
             printf(" FINAL MISSION UNLOCKED! \n");
             printf("You can now fight the Dark Lord :)!\n");
+        }
+    }
+}
+void mission_inside_menu(MissionSystem *system, Hero *hero)
+{
+    int choice;
+    char input[100];
+
+    while (1)
+    {
+        printf("\n");
+        printf("===============================\n");
+        printf("      MISSION MENU\n");
+        printf("===============================\n");
+        printf("Mission: %s\n", system->missions[system->current_mission].name);
+        printf("Objective: %s\n", system->missions[system->current_mission].objective);
+        printf("Progress: %d/%d\n",
+               system->missions[system->current_mission].objectives_completed,
+               system->missions[system->current_mission].objectives_required);
+        printf("===============================\n");
+        printf("1. Explore Dungeon Room\n");
+        printf("2. Shop\n");
+        printf("3. Show Inventory\n");
+        printf("4. Return to Village\n");
+        printf("===============================\n");
+        printf("Your choice (1-4): ");
+
+        fgets(input, 100, stdin);
+        if (strlen(input) > 0)
+        {
+            input[strlen(input) - 1] = '\0';
+        }
+        choice = atoi(input);
+
+        if (choice == 1)
+        {
+            printf("\nExploring room...\n");
+            printf("Dungeon system not ready yet!\n");
+
+            mission_update_progress(system, 1);
+        }
+        else if (choice == 2)
+        {
+            printf("\nOpening shop...\n");
+            printf("Shop system not ready yet!\n");
+        }
+        else if (choice == 3)
+        {
+            printf("\n--- INVENTORY ---\n");
+            printf("HP: %d\n", hero->life_points);
+            printf("Coins: %d\n", hero->coins);
+            printf("Sword: %s\n", hero->sword ? "YES" : "NO");
+            printf("Armor: %s\n", hero->armor ? "YES" : "NO");
+            printf("Health Potions: %d\n", hero->health_potions);
+        }
+        else if (choice == 4)
+        {
+            printf("\nReturning to village...\n");
+
+            if (system->missions[system->current_mission].status != MISSION_COMPLETED)
+            {
+                printf("Mission not completed! Pay 50 coins to leave?\n");
+                printf("You have %d coins. (y/n): ", hero->coins);
+
+                char answer[10];
+                fgets(answer, 10, stdin);
+                answer[strlen(answer) - 1] = '\0';
+
+                if ((answer[0] == 'y' || answer[0] == 'Y') && hero->coins >= 50)
+                {
+                    hero->coins -= 50;
+                    printf("Paid 50 coins. Returning to village.\n");
+                    break;
+                }
+                else if (hero->coins < 50)
+                {
+                    printf("Not enough coins! You need 50, but have %d.\n", hero->coins);
+                    printf("You must complete the mission first.\n");
+                }
+                else
+                {
+                    printf("Staying in mission.\n");
+                    continue;
+                }
+            }
+            else
+            {
+                printf("Mission completed! Returning to village.\n");
+                break;
+            }
+        }
+        else
+        {
+            printf("\nWrong choice! Please enter 1-4.\n");
         }
     }
 }

@@ -1,7 +1,9 @@
 #ifndef MISSION_H
 #define MISSION_H
+
 #include <stdbool.h>
 #include "dungeon_name.h"
+#include "hero.h"
 
 typedef enum
 {
@@ -9,7 +11,6 @@ typedef enum
     MISSION_IN_PROGRESS,
     MISSION_COMPLETED
 } MissionStatus;
-
 
 typedef struct
 {
@@ -27,11 +28,13 @@ typedef struct
     int current_mission;
     int missions_completed;
     bool final_unlocked;
-} MissionSystem;
+} MissionSystem; // <-- MissionSystem is now defined here
 
+// Function prototypes – ALL placed AFTER the struct definition
 void mission_init(MissionSystem *system);
 void mission_display_menu(MissionSystem *system);
-int mission_select(MissionSystem *system, int choice);
+int mission_select(MissionSystem *system, int choice, Hero *hero); // <-- 3 parameters!
 void mission_update_progress(MissionSystem *system, int progress);
+void mission_inside_menu(MissionSystem *system, Hero *hero); // if you use it
 
 #endif

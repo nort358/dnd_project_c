@@ -4,6 +4,8 @@
 #include "../include/load_menu.h"
 #include "../include/hero.h"
 #include "../include/village_menu.h"
+#include <time.h> //for random numbers
+#include <hero.h>
 
 void main_menu(int cheatcode_unlocked)
 {
@@ -76,6 +78,7 @@ void main_menu(int cheatcode_unlocked)
 
 int main()
 {
+   srand(time(NULL)); //random numbers 
     main_menu(0);
     return 0;
 }
