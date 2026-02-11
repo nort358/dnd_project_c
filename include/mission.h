@@ -7,9 +7,9 @@
 
 typedef enum
 {
-    MISSION_NOT_STARTED,
-    MISSION_IN_PROGRESS,
-    MISSION_COMPLETED
+    NOT_STARTED,
+    IN_PROGRESS,
+    DONE
 } MissionStatus;
 
 typedef struct
@@ -28,13 +28,11 @@ typedef struct
     int current_mission;
     int missions_completed;
     bool final_unlocked;
-} MissionSystem; // <-- MissionSystem is now defined here
+} MissionSystem;
 
-// Function prototypes – ALL placed AFTER the struct definition
-void mission_init(MissionSystem *system);
-void mission_display_menu(MissionSystem *system);
-int mission_select(MissionSystem *system, int choice, Hero *hero); // <-- 3 parameters!
-void mission_update_progress(MissionSystem *system, int progress);
-void mission_inside_menu(MissionSystem *system, Hero *hero); // if you use it
+void mission_init(MissionSystem *s);
+void mission_display_menu(MissionSystem *s);
+int mission_select(MissionSystem *s, int choice, Hero *h);
+void mission_update_progress(MissionSystem *s, int add);
 
 #endif

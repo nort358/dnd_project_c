@@ -1,84 +1,81 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "../include/load_menu.h"
 #include "../include/hero.h"
 #include "../include/village_menu.h"
-#include <time.h> //for random numbers
-#include <hero.h>
 
-void main_menu(int cheatcode_unlocked)
+void main_menu(int cheat_unlocked)
 {
-    printf("\nInitial Game Memu\n\n\n");
-    printf("1. New Game\n");
-    printf("2. Load Game\n");
-    if (cheatcode_unlocked)
+    Hero hero;
+    char input[10];
+    char cheat_code[12] = "wwssadadba ";
+    int cheat_pos = 0;
+    int cheat_on = cheat_unlocked;
+
+    while (1)
     {
-        printf("3. Cheats\n");
-    }
-    else
-    {
-        printf("\nChoose an action (1-2): ");
+        printf("\n=== GAME MENU ===\n");
+        printf("1. New Game\n");
+        printf("2. Load Game\n");
+        if (cheat_on)
+            printf("3. Cheats\n");
+        printf("Choose: ");
+
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0;
+
+        // Konami code
+        if (!cheat_on && input[0] == cheat_code[cheat_pos])
+        {
+            cheat_pos++;
+            if (cheat_pos == 11)
+            {
+                printf("Cheats unlocked!\n");
+                cheat_on = 1;
+                cheat_pos = 0;
+            }
+            continue;
+        }
+        else
+            cheat_pos = 0;
+
+        if (!cheat_on && (strcmp(input, "1") == 0 || strcmp(input, "2") == 0))
+            break;
+        if (cheat_on && (strcmp(input, "1") == 0 || strcmp(input, "2") == 0 || strcmp(input, "3") == 0))
+            break;
     }
 
-    char choice[100];
-    char cheat_code[12] = "wwssadadba ";
-    int cheat_attempt = 0;
-    while (fgets(choice, sizeof(choice), stdin))
-    {                                         // fgets reads a line from stdin: fgets(variable, size of variable, source of input)
-        choice[strcspn(choice, "\n")] = '\0'; // remove \n, cause fgets gets a whole line including \n
-        if (!cheatcode_unlocked && (strcmp(choice, "1") == 0 || strcmp(choice, "2") == 0))
-        { // go if cheatcode is locked. strcmp returns 0 if equal
-            break;
-        }
-        else if (cheatcode_unlocked && (strcmp(choice, "1") == 0 || strcmp(choice, "2") == 0 || strcmp(choice, "3") == 0))
-        { // go if cheatcode is unlocked
-            break;
-        }
-        if (choice[0] == cheat_code[cheat_attempt])
-        { // as we have only one char to compare, we can use choice[0]
-            cheat_attempt++;
-            if (cheat_attempt == 11)
-            {
-                printf("Unclocked!\n");
-                main_menu(1);
-                break;
-            }
-        }
-        else
-        {
-            cheat_attempt = 0; // reset if once a wrong char is entered
-        }
-        if (!cheatcode_unlocked)
-        {
-            printf("Choose an action (1-2): ");
-        }
-        else
-        {
-            printf("Choose an action (1-3): ");
-        }
-    }
-    switch (choice[0])
-    { // we can use choice[0] as we only need the first char
-    case '1':
-        printf("Starting a new game...\n");
-        Hero hero = {20, 0, 0, 0, 0, 0, 0, 0, 0}; // initialize a new hero
+    if (input[0] == '1')
+    {
+        printf("\nStarting a new game...\n");
+        hero.life_points = 20;
+        hero.coins = 0;
+        hero.sword = 0;
+        hero.armor = 0;
+        hero.health_potions = 0;
+        hero.first_mission_completed = 0;
+        hero.second_mission_completed = 0;
+        hero.third_mission_completed = 0;
+        hero.final_mission_unlocked = 0;
         village_menu(&hero);
-        break; // if you dont't put break here, it will continue to case 2
-    case '2':
-        printf("Loading a saved game...\n");
+    }
+    else if (input[0] == '2')
+    {
+        printf("\nLoading saved game...\n");
         load_menu(&hero);
-        break;
-    case '3':
-        printf("Loading cheats...\n");
-        // load_menu(cheats=true);
-        break;
+    }
+    else if (input[0] == '3' && cheat_on)
+    {
+        printf("\nCheats menu (coming soon).\n");
+        main_menu(cheat_on);
     }
 }
 
 int main()
 {
-   srand(time(NULL)); //random numbers 
+    srand(time(NULL));
     main_menu(0);
     return 0;
 }

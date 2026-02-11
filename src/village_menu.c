@@ -8,103 +8,83 @@
 #include "../include/dungeon.h"
 #include "../include/dungeon_name.h"
 
+// shop
 void shop_menu(Hero *h)
 {
-    int cho;
+    int c;
     while (1)
     {
         printf("\n=== SHOP ===\n");
-        printf("Your coins: %d\n", h->coins);
-        printf("1. Health Potion  -  4 coins\n");
-        printf("2. Sword          -  5 coins\n");
-        printf("3. Armor          - 10 coins\n");
-        printf("4. Exit shop\n");
+        printf("Coins: %d\n", h->coins);
+        printf("1. Potion (4)  +1-6 HP\n");
+        printf("2. Sword (5)  +1 att\n");
+        printf("3. Armor (10) -1 dmg\n");
+        printf("4. Exit\n");
         printf("Choose: ");
-        scanf("%d", &cho);
+        scanf("%d", &c);
         getchar();
 
-        switch (cho)
+        if (c == 1 && h->coins >= 4)
         {
-        case 1:
-            if (h->coins >= 4)
-            {
-                h->coins -= 4;
-                h->health_potions++;
-                printf("Bought Health Potion! You have %d now.\n", h->health_potions);
-            }
-            else
-                printf("Not enough coins! (need 4)\n");
-            break;
-        case 2:
-            if (h->sword)
-                printf("You already have a Sword!\n");
-            else if (h->coins >= 5)
-            {
-                h->coins -= 5;
-                h->sword = 1;
-                printf("Bought Sword! +1 attack now.\n");
-            }
-            else
-                printf("Not enough coins! (need 5)\n");
-            break;
-        case 3:
-            if (h->armor)
-                printf("You already have Armor!\n");
-            else if (h->coins >= 10)
-            {
-                h->coins -= 10;
-                h->armor = 1;
-                printf("Bought Armor! -1 damage taken.\n");
-            }
-            else
-                printf("Not enough coins! (need 10)\n");
-            break;
-        case 4:
-            printf("Leaving shop...\n");
-            return;
-        default:
-            printf("Invalid choice.\n");
+            h->coins -= 4;
+            h->health_potions++;
+            printf("Got potion! now %d\n", h->health_potions);
         }
+        else if (c == 2 && !h->sword && h->coins >= 5)
+        {
+            h->coins -= 5;
+            h->sword = 1;
+            printf("Got sword! +1 attack\n");
+        }
+        else if (c == 3 && !h->armor && h->coins >= 10)
+        {
+            h->coins -= 10;
+            h->armor = 1;
+            printf("Got armor! -1 damage\n");
+        }
+        else if (c == 4)
+        {
+            printf("bye\n");
+            return;
+        }
+        else
+            printf("cant buy\n");
     }
 }
 
-// COMBAT
+// fight
 int fight_enemy(Hero *h, Room *r)
 {
-    printf("\n--- FIGHT! ---\n");
-    printf("Enemy: %d (need %d+ to hit)\n", r->name, r->fatal_strike);
-
+    printf("\n--- FIGHT ---\n");
+    printf("Enemy %d (need %d+)\n", r->name, r->fatal_strike);
     while (h->life_points > 0)
     {
-        int att = rand() % 6 + 1;
+        int a = rand() % 6 + 1;
         if (h->sword)
-            att += 1;
-
-        printf("You roll %d", att - (h->sword ? 1 : 0));
+            a++;
+        printf("roll %d", a - (h->sword ? 1 : 0));
         if (h->sword)
-            printf(" +1 sword = %d", att);
+            printf("+1 = %d", a);
         printf("\n");
-
-        if (att >= r->fatal_strike)
+        if (a >= r->fatal_strike)
         {
-            printf("*** VICTORY! ***\n");
+            printf("VICTORY!\n");
             h->coins += r->reward_coins;
-            printf("You got %d coins! (now %d)\n", r->reward_coins, h->coins);
+            printf("+%d coins (now %d)\n", r->reward_coins, h->coins);
             return 1;
         }
         else
         {
-            int dmg = r->damage;
+            int d = r->damage;
             if (h->armor)
-                dmg -= 1;
-            if (dmg < 1)
-                dmg = 1;
-            h->life_points -= dmg;
-            printf("Enemy hits for %d damage! You have %d HP left.\n", dmg, h->life_points);
-
+                d--;
+            if (d < 1)
+                d = 1;
+            h->life_points -= d;
+            printf("hit -%d HP (left %d)\n", d, h->life_points);
             if (h->life_points <= 0)
             {
-                printf("\n*** YOU DIED... GAME OVER ***\n");
+                printf("GAME OVER\n");
                 return 0;
             }
         }
@@ -112,286 +92,222 @@ int fight_enemy(Hero *h, Room *r)
     return 0;
 }
 
-//  FINAL BOSS – rock paper scissors
-int final_boss_fight(Hero *hero)
+// final boss
+int final_boss_fight(Hero *h)
 {
-    printf("\n");
-    printf("     DARK LORD CASTLE - FINAL BOSS\n");
-    printf("You face the Dark Lord! Best of 5 rounds.\n");
-    printf("Shield beats Sword, Sword beats Magic, Magic beats Shield.\n");
-    printf("Press Enter to start...");
+    printf("\n----DARK LORD----\n");
+    printf("Rock Paper Scissors, best of 5\n");
+    printf("1=Shield 2=Magic 3=Sword\n");
+    printf("Enter to start...");
     getchar();
     getchar();
 
-    int h_score = 0;
-    int b_score = 0;
-    int rnd = 1;
-
-    while (h_score < 3 && b_score < 3 && rnd <= 5)
+    int p = 0, d = 0, r = 1;
+    while (p < 3 && d < 3 && r <= 5)
     {
-        printf("\n--- Round %d ---\n", rnd);
-        printf("You: %d  |  Dark Lord: %d\n", h_score, b_score);
-        printf("1. Shield\n2. Magic\n3. Sword\n");
+        printf("\nRound %d: You %d - Dark %d\n", r, p, d);
         printf("Your move: ");
-        int hm;
-        scanf("%d", &hm);
+        int m;
+        scanf("%d", &m);
         getchar();
-
-        if (hm < 1 || hm > 3)
+        if (m < 1 || m > 3)
         {
-            printf("Wrong move! You lose the round.\n");
-            b_score++;
-            rnd++;
+            printf("invalid, you lose round\n");
+            d++;
+            r++;
             continue;
         }
-
         int bm = rand() % 3 + 1;
-
-        printf("You chose: ");
-        if (hm == 1)
-            printf("Shield\n");
-        else if (hm == 2)
-            printf("Magic\n");
-        else
-            printf("Sword\n");
-
-        printf("Dark Lord chose: ");
-        if (bm == 1)
-            printf("Shield\n");
-        else if (bm == 2)
-            printf("Magic\n");
-        else
-            printf("Sword\n");
-
-        if (hm == bm)
+        printf("You: %d, Dark: %d\n", m, bm);
+        if (m == bm)
+            printf("tie\n");
+        else if ((m == 1 && bm == 3) || (m == 2 && bm == 1) || (m == 3 && bm == 2))
         {
-            printf("No winner.\n");
-        }
-        else if ((hm == 1 && bm == 3) ||
-                 (hm == 2 && bm == 1) ||
-                 (hm == 3 && bm == 2))
-        {
-            printf(" YOU WIN THE ROUND! \n");
-            h_score++;
+            printf("you win round\n");
+            p++;
         }
         else
         {
-            printf(" DARK LORD WINS THE ROUND!\n");
-            b_score++;
+            printf("dark wins round\n");
+            d++;
         }
-        rnd++;
+        r++;
     }
-
-    if (h_score >= 3)
+    if (p >= 3)
     {
-        printf("🎉 YOU DEFEATED THE DARK LORD! :)🎉\n");
-        printf("The kingdom is saved!\n");
-        hero->third_mission_completed = 1; // final mission done
+        printf("YOU WIN! Dark Lord dead\n");
+        h->third_mission_completed = 1;
         return 1;
     }
     else
     {
-        printf("💀 The Dark Lord defeated you :(( ... GAME OVER 💀\n");
+        printf("YOU LOSE... GAME OVER\n");
         return 0;
     }
 }
 
-//  VILLAGE MENU
+// village menu
 void village_menu(Hero *hero)
 {
     int act;
-    char inp[100];
-
+    char buf[100];
     while (1)
     {
-        printf("\n");
-        printf("***************\n");
-        printf("VILLAGE SCREEN\n");
-        printf("***************\n");
-        printf("Hero: %d HP | Money: %d\n", hero->life_points, hero->coins);
-        printf("***************\n");
-        printf("1. GO ON MISSION\n");
-        printf("2. SLEEP Zzz ( you cam get HP back to 20)\n");
-        printf("3. SEE MY STUFF\n");
-        printf("4. KEEP GAME\n");
-        printf("5. BACK TO START\n");
-        printf("***************\n");
-        printf("Type 1 to 5: ");
 
-        if (fgets(inp, sizeof(inp), stdin))
+        printf("***************\n");
+        printf("VILLAGE\n");
+        printf("***************\n");
+        printf("HP:%d Coins:%d\n\n", hero->life_points, hero->coins);
+        printf("1. Mission\n");
+        printf("2. Sleep\n");
+        printf("3. Stuff\n");
+        printf("4. Save\n");
+        printf("5. Exit\n");
+        printf("\n> ");
+        fgets(buf, sizeof(buf), stdin);
+        buf[strcspn(buf, "\n")] = 0;
+        act = atoi(buf);
+
+        switch (act)
         {
-            inp[strcspn(inp, "\n")] = 0;
-            act = atoi(inp);
+        case 1:
+        {
+            MissionSystem ms;
+            mission_init(&ms);
+            mission_display_menu(&ms);
 
-            switch (act)
+            int pick;
+            scanf("%d", &pick);
+            getchar();
+
+            int m = mission_select(&ms, pick, hero);
+            if (m >= 0)
             {
-            case 1:
-            {
-                MissionSystem ms;
-                mission_init(&ms);
-                mission_display_menu(&ms);
-
-                int pick;
-                scanf("%d", &pick);
-
-                int midx = mission_select(&ms, pick, hero);
-                if (midx >= 0)
+                if (pick == 4) // final
                 {
-                    // FINAL MISSION
-                    if (pick == 4)
+                    printf("\nFINAL MISSION\n");
+                    if (final_boss_fight(hero))
                     {
-                        printf("\n=== FINAL MISSION: DARK LORD CASTLE ===\n");
-                        int win = final_boss_fight(hero);
-                        if (win)
-                        {
-                            printf("Congratulations! You won the game!\n");
-                            return;
-                        }
-                        else
-                        {
-                            printf("You were defeated... Returning to main menu.\n");
-                            return;
-                        }
+                        printf("You won! congrats!\n");
+                        return;
                     }
-
-                    // NORMAL MISSIONS (1,2,3)
-                    printf("\n=== ENTERING DUNGEON ===\n");
-                    Dungeon d;
-                    if (pick == 1)
-                        d = generate_dungeon(hero, ROTTING_SWAMP);
-                    else if (pick == 2)
-                        d = generate_dungeon(hero, HAUNTED_MANSION);
-                    else if (pick == 3)
-                        d = generate_dungeon(hero, CRYSTAL_CAVE);
-
-                    printf("Dungeon has 10 rooms.\n\n");
-
-                    // SHOP before fighting
-                    shop_menu(hero);
-
-                    // mission counters
-                    int gen_kill = 0;
-                    int vamp_kill = 0;
-                    int key_get = 0;
-
-                    for (int i = 0; i < 10; i++)
+                    else
                     {
-                        printf("--- Room %d/%d ---\n", i + 1, 10);
-                        printf("You see: %d\n", d.rooms[i].name);
+                        printf("You died... back to menu\n");
+                        return;
+                    }
+                }
 
-                        // EMPTY
-                        if (d.rooms[i].type == 0)
+                printf("\n=== DUNGEON ===\n");
+                Dungeon d;
+                if (pick == 1)
+                    d = generate_dungeon(hero, ROTTING_SWAMP);
+                else if (pick == 2)
+                    d = generate_dungeon(hero, HAUNTED_MANSION);
+                else
+                    d = generate_dungeon(hero, CRYSTAL_CAVE);
+
+                printf("10 rooms\n\n");
+                shop_menu(hero);
+
+                int gen = 0, vamp = 0, key = 0;
+                for (int i = 0; i < 10; i++)
+                {
+                    printf("-- Room %d/10 --\n", i + 1);
+                    printf("see: %d\n", d.rooms[i].name);
+
+                    if (d.rooms[i].type == 0)
+                        printf("empty\n");
+                    else if (d.rooms[i].type == 1)
+                    {
+                        int w = fight_enemy(hero, &d.rooms[i]);
+                        if (w == 0)
                         {
-                            printf("Nothing here.\n");
+                            printf("\nback to main\n");
+                            return;
                         }
-                        // ENEMY
-                        else if (d.rooms[i].type == 1)
+
+                        if (d.rooms[i].name == ORC_GENERAL)
                         {
-                            int w = fight_enemy(hero, &d.rooms[i]);
-                            if (w == 0)
+                            gen++;
+                            printf("Orc generals %d/3\n", gen);
+                            if (gen >= 3)
                             {
-                                printf("\nReturning to main menu...\n");
-                                return;
-                            }
-
-                            // Rotting Swamp
-                            if (d.rooms[i].name == ORC_GENERAL)
-                            {
-                                gen_kill++;
-                                printf("Orc Generals: %d/3\n", gen_kill);
-                                if (gen_kill >= 3)
-                                {
-                                    printf("\n*** ROTTING SWAMP COMPLETE! ***\n");
-                                    hero->first_mission_completed = 1;
-                                    mission_update_progress(&ms, 1);
-                                    break;
-                                }
-                            }
-
-                            // Haunted Mansion
-                            if (d.rooms[i].name == GREAT_VAMPHIRE)
-                            {
-                                vamp_kill = 1;
-                                printf("Greater Vampire killed! 1/2\n");
+                                printf("*** ROTTING SWAMP DONE ***\n");
+                                hero->first_mission_completed = 1;
                                 mission_update_progress(&ms, 1);
-                            }
-                            if (d.rooms[i].name == GURDIAN_DEMON)
-                            {
-                                key_get = 1;
-                                printf("Guardian Demon killed! Got the key! 1/2\n");
-                                mission_update_progress(&ms, 1);
-                            }
-
-                            if (pick == 2 && vamp_kill && key_get)
-                            {
-                                printf("\n*** HAUNTED MANSION COMPLETE! ***\n");
-                                hero->second_mission_completed = 1;
                                 break;
                             }
                         }
-                        // TRAP
-                        else if (d.rooms[i].type == 2)
+                        if (d.rooms[i].name == GREAT_VAMPHIRE)
                         {
-                            int dmg = d.rooms[i].damage;
-                            if (d.rooms[i].damage == 0)
-                                dmg = rand() % 6 + 1;
-                            hero->life_points -= dmg;
-                            printf("TRAP! -%d HP (HP now %d)\n", dmg, hero->life_points);
-                            if (hero->life_points <= 0)
-                            {
-                                printf("\n*** GAME OVER ***\n");
-                                return;
-                            }
+                            vamp = 1;
+                            printf("Vampire killed (1/2)\n");
+                            mission_update_progress(&ms, 1);
                         }
-
-                        printf("\nPress Enter...");
-                        getchar();
-                        getchar();
+                        if (d.rooms[i].name == GURDIAN_DEMON)
+                        {
+                            key = 1;
+                            printf("Key got (1/2)\n");
+                            mission_update_progress(&ms, 1);
+                        }
+                        if (pick == 2 && vamp && key)
+                        {
+                            printf("*** HAUNTED MANSION DONE ***\n");
+                            hero->second_mission_completed = 1;
+                            break;
+                        }
                     }
-                    printf("\nYou return to the village.\n");
+                    else if (d.rooms[i].type == 2)
+                    {
+                        int dmg = d.rooms[i].damage;
+                        if (dmg == 0)
+                            dmg = rand() % 6 + 1;
+                        hero->life_points -= dmg;
+                        printf("trap -%d HP (now %d)\n", dmg, hero->life_points);
+                        if (hero->life_points <= 0)
+                        {
+                            printf("*** GAME OVER ***\n");
+                            return;
+                        }
+                    }
+
+                    printf("Press Enter...");
+                    getchar();
+                    getchar();
                 }
-                break;
+                printf("\nback to village\n");
             }
-
-            case 2:
-                printf("\nZzz... HP restored to 20!\n");
-                hero->life_points = 20;
-                break;
-
-            case 3:
-                printf("\nMY STUFF\n");
-                printf("HP: %d\n", hero->life_points);
-                printf("Money: %d\n", hero->coins);
-                printf("Sword: %s\n", hero->sword ? "YES" : "NO");
-                printf("Armor: %s\n", hero->armor ? "YES" : "NO");
-                printf("Health potions: %d\n", hero->health_potions);
-                printf("Missions done: %d/3\n",
-                       (hero->first_mission_completed +
-                        hero->second_mission_completed +
-                        hero->third_mission_completed));
-                break;
-
-            case 4:
-                save_game(hero);
-                break;
-
-            case 5:
-                printf("Bye Bye:)! Back to main menu.\n");
-                return;
-
-            case 9: // cheat
-                hero->coins += 1000;
-                hero->first_mission_completed = 1;
-                hero->second_mission_completed = 1;
-                printf("\nCHEAT! +1000 coins, first 2 missions done.\n");
-                break;
-
-            default:
-                printf("Wrong input! 1-5 only!!.\n");
-            }
+            break;
         }
 
-        printf("\nPress ENTER to continue...");
+        case 2:
+            hero->life_points = 20;
+            printf("HP 20\n");
+            break;
+        case 3:
+            printf("\nHP:%d\nCoins:%d\n", hero->life_points, hero->coins);
+            printf("Sword:%s\n", hero->sword ? "Y" : "N");
+            printf("Armor:%s\n", hero->armor ? "Y" : "N");
+            printf("Potions:%d\n", hero->health_potions);
+            printf("Missions:%d/3\n", hero->first_mission_completed + hero->second_mission_completed + hero->third_mission_completed);
+            break;
+        case 4:
+            save_game(hero);
+            break;
+        case 5:
+            printf("bye\n");
+            return;
+        case 9:
+            hero->coins += 1000;
+            hero->first_mission_completed = 1;
+            hero->second_mission_completed = 1;
+            printf("cheat +1000 coins, missions 1&2 done\n");
+            break;
+        default:
+            printf("wrong input!!\n");
+        }
+        printf("\nPress Enter...");
         getchar();
     }
 }
