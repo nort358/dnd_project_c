@@ -46,9 +46,15 @@ void village_menu(Hero *hero)
                 int pick;
                 scanf("%d", &pick);
 
-                int ok = mission_select(&missions, pick, hero);
-                if (ok >= 0)
+                int mission_index = mission_select(&missions, pick, hero);
+                if (mission_index >= 0)
                 {
+
+                    mission_inside_menu(&missions, hero);
+
+                    hero->first_mission_completed = (missions.missions[0].status == MISSION_COMPLETED) ? 1 : 0;
+                    hero->second_mission_completed = (missions.missions[1].status == MISSION_COMPLETED) ? 1 : 0;
+                    hero->third_mission_completed = (missions.missions[2].status == MISSION_COMPLETED) ? 1 : 0;
                     printf("\n>>> GOING INTO DUNGEON <<<\n");
 
                     Dungeon d;
