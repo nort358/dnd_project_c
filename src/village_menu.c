@@ -16,14 +16,13 @@ void shop_menu(Hero *h)
     {
         printf("\n=== SHOP ===\n");
         printf("Your coins: %d\n", h->coins);
-        printf("1. Health Potion  -  4 coins  (restores 1-6 HP)\n");
-        printf("2. Sword          -  5 coins  (+1 attack, one time)\n");
-        printf("3. Armor          - 10 coins  (-1 damage, one time)\n");
+        printf("1. Health Potion  -  4 coins\n");
+        printf("2. Sword          -  5 coins\n");
+        printf("3. Armor          - 10 coins\n");
         printf("4. Exit shop\n");
         printf("Choose: ");
-
         scanf("%d", &choice);
-        getchar(); // remove newline
+        getchar();
 
         switch (choice)
         {
@@ -36,7 +35,6 @@ void shop_menu(Hero *h)
                 }
                 else printf("Not enough coins! (need 4)\n");
                 break;
-
             case 2:
                 if (h->sword)
                     printf("You already have a Sword!\n");
@@ -48,7 +46,6 @@ void shop_menu(Hero *h)
                 }
                 else printf("Not enough coins! (need 5)\n");
                 break;
-
             case 3:
                 if (h->armor)
                     printf("You already have Armor!\n");
@@ -60,11 +57,9 @@ void shop_menu(Hero *h)
                 }
                 else printf("Not enough coins! (need 10)\n");
                 break;
-
             case 4:
                 printf("Leaving shop...\n");
                 return;
-
             default:
                 printf("Invalid choice.\n");
         }
@@ -72,7 +67,6 @@ void shop_menu(Hero *h)
 }
 
 // ---------- COMBAT ----------
-// 1 = win, 0 = hero dies
 int fight_enemy(Hero *h, Room *r)
 {
     printf("\n--- FIGHT! ---\n");
@@ -127,7 +121,7 @@ void village_menu(Hero *hero)
         printf("Hero: %d HP | Money: %d\n", hero->life_points, hero->coins);
         printf("***************\n");
         printf("1. GO ON MISSION\n");
-        printf("2. SLEEP (get HP back to 20)\n");
+        printf("2. SLEEP Zzz (get HP back to 20)\n");
         printf("3. SEE MY STUFF\n");
         printf("4. KEEP GAME\n");
         printf("5. BACK TO START\n");
@@ -139,11 +133,10 @@ void village_menu(Hero *hero)
             typed[strcspn(typed, "\n")] = 0;
             what = atoi(typed);
 
-            switch (what)   // <-- switch starts here!
+            switch (what)
             {
                 case 1:
                 {
-                    // --- Mission menu ---
                     MissionSystem missions;
                     mission_init(&missions);
                     mission_display_menu(&missions);
@@ -173,9 +166,9 @@ void village_menu(Hero *hero)
                         shop_menu(hero);
 
                         // --- Mission-specific objective counters ---
-                        int generals_killed = 0;      // Rotting Swamp
-                        int vampire_killed = 0;       // Haunted Mansion
-                        int key_obtained = 0;         // Haunted Mansion
+                        int generals_killed = 0;
+                        int vampire_killed = 0;
+                        int key_obtained = 0;
 
                         // --- Go through each room ---
                         for (int i = 0; i < 10; i++)
@@ -203,7 +196,6 @@ void village_menu(Hero *hero)
                                 {
                                     generals_killed++;
                                     printf("Orc Generals defeated: %d/3\n", generals_killed);
-
                                     if (generals_killed >= 3)
                                     {
                                         printf("\n*********************************\n");
@@ -243,11 +235,10 @@ void village_menu(Hero *hero)
                             else if (d.rooms[i].type == 2)
                             {
                                 int dmg = d.rooms[i].damage;
-                                if (d.rooms[i].damage == 0) dmg = rand() % 6 + 1;
-                                
+                                if (d.rooms[i].damage == 0)
+                                    dmg = rand() % 6 + 1;
                                 hero->life_points -= dmg;
                                 printf("TRAP! You lose %d HP. (HP now %d)\n", dmg, hero->life_points);
-                                
                                 if (hero->life_points <= 0)
                                 {
                                     printf("\n*** YOU DIED... GAME OVER ***\n");
@@ -299,7 +290,7 @@ void village_menu(Hero *hero)
 
                 default:
                     printf("\nWrong number! Use 1 to 5\n");
-            } // switch ends here
+            }
         }
 
         printf("\nPress ENTER to go on...\n");
