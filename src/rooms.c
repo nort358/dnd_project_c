@@ -9,6 +9,29 @@ int DUNGEON_TO_ROOM[3][6] = {{WILD_DOG,GOBLIN,SKELETON,ORC,POISONOUS_BOG,ORC_GEN
 {EMPTY_ROOM,FALLING_CRYSTALS,UNSAFE_BRIDGE,MYSTERIOUS_CHEST,STEEP_CLIFF,ANCIENT_DRAGON}};
 
 
+char* DUNGEON_TO_NAME[18]={
+    "Empty Room",
+    "Wild Dog",
+    "Goblin",
+    "Skeleton",
+    "Orc",
+    "Poisonous Bog",
+    "Orc General",
+    "Dark Hatch",
+    "Bat",
+    "Zombie",
+    "Phantom",
+    "Great Vampire",
+    "Gurdian Demon",
+    "Falling Crystals",
+    "Unsafe Bridge",
+    "Mysterious Chest",
+    "Steep Cliff",
+    "Ancient Dragon"
+};
+
+
+
 Room generate_room(RoomName room_name,Hero* h)
 {
     Room room;

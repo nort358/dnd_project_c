@@ -31,6 +31,7 @@ typedef enum
 } RoomName;
 
 extern int DUNGEON_TO_ROOM[3][6];
+extern char* DUNGEON_TO_NAME[18];
 
 typedef struct
 {

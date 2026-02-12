@@ -56,7 +56,7 @@ void shop_menu(Hero *h)
 int fight_enemy(Hero *h, Room *r)
 {
     printf("\n--- FIGHT ---\n");
-    printf("Enemy %d (need %d+)\n", r->name, r->fatal_strike);
+    printf("The hero encounters %s and the fight begins .\n", DUNGEON_TO_NAME[r->name]);
     while (h->life_points > 0)
     {
         int a = rand() % 6 + 1;
@@ -158,9 +158,9 @@ void village_menu(Hero *hero)
         printf("VILLAGE\n");
         printf("***************\n");
         printf("HP:%d Coins:%d\n\n", hero->life_points, hero->coins);
-        printf("1. Mission\n");
-        printf("2. Sleep\n");
-        printf("3. Stuff\n");
+        printf("1. Start a mission\n");
+        printf("2. Rest\n");
+        printf("3. Inventory\n");
         printf("4. Save\n");
         printf("5. Exit\n");
         printf("\n> ");
@@ -211,10 +211,11 @@ void village_menu(Hero *hero)
                 shop_menu(hero);
 
                 int gen = 0, vamp = 0, key = 0;
+                
                 for (int i = 0; i < 10; i++)
                 {
                     printf("-- Room %d/10 --\n", i + 1);
-                    printf("see: %d\n", d.rooms[i].name);
+                    printf("see: %s\n", DUNGEON_TO_NAME[d.rooms[i].name]);
 
                     if (d.rooms[i].type == 0)
                         printf("empty\n");

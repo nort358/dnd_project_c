@@ -41,7 +41,7 @@ int generate_new_save_idx()
 
 void save_game(Hero *hero)
 {
-    mkdir(save_folder);
+    mkdir(save_folder, 0755);
     char path[256];
     int save_idx = generate_new_save_idx();
     snprintf(path, sizeof(path), "%s/%d.save", save_folder, save_idx);

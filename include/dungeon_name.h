@@ -3,10 +3,10 @@
 
 typedef enum
 {
-    ROTTING_SWAMP = 1,
-    HAUNTED_MANSION = 2,
-    CRYSTAL_CAVE = 3,
-    DARK_LORD_CASTLE = 4
+    ROTTING_SWAMP = 0,
+    HAUNTED_MANSION = 1,
+    CRYSTAL_CAVE = 2,
+    DARK_LORD_CASTLE = 3
 } DUNGEON_NAME;
 
 #endif

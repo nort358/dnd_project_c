@@ -8,6 +8,7 @@
 
 void main_menu(int cheat_unlocked)
 {
+    srand(time(NULL));
     Hero hero;
     char input[10];
     char cheat_code[12] = "wwssadadba ";
@@ -50,7 +51,7 @@ void main_menu(int cheat_unlocked)
     if (input[0] == '1')
     {
         printf("\nStarting a new game...\n");
-        hero.life_points = 20;
+        hero.life_points = 2000;//TODO make 20!!!!!!!!
         hero.coins = 0;
         hero.sword = 0;
         hero.armor = 0;
