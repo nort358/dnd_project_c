@@ -1,0 +1,13 @@
+build/
+*.exe
+*.o
+*.out
+*.a
+*.so
+*.dll
+*.dSYM/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.swp
