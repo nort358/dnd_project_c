@@ -59,6 +59,7 @@ void save_game(Hero *hero)
     Save save = {current_time, save_idx, *hero};
     fwrite(&save, sizeof(save), 1, file);
     fclose(file);
+    printf("Game %d saved to %s\n", save_idx, path);
 }
 void delete_save(int save_idx)
 {

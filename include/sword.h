@@ -3,7 +3,8 @@
 typedef enum
 {
     NO_SWORD = 0,
-    SWORD=1,
+    USUAL_SWORD=1,
     HERO_SWORD=2
 } SwordType;
+extern const char* SWORDS[3];
 #endif

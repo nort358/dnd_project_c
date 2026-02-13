@@ -4,8 +4,10 @@
 #include "../include/save.h"
 #include "../include/hero.h"
 #include "../include/village_menu.h"
+#include "../include/mission.h"
+#include "../include/tools.h"
 
-void load_menu(Hero* hero)
+void load_menu(Hero* hero, MissionSystem *ms, int from_cheats)
 {
     SaveList saves = load_saves();
     
@@ -22,8 +24,7 @@ void load_menu(Hero* hero)
     
     int pick;
     printf("\nPick a game [1-%d]: ", saves.count);
-    scanf("%d", &pick);
-    getchar();
+    safe_scanf(&pick);
     
     if(pick < 1 || pick > saves.count)
     {
@@ -35,8 +36,12 @@ void load_menu(Hero* hero)
     
 
     int act;
-    printf("\n1. Load\n2. Delete\nChoose: ");
-    scanf("%d", &act);
+    printf("\n1. Load\n");
+    if (!from_cheats){
+    printf("2. Delete\n");
+    }
+    printf("Choose: ");
+    safe_scanf(&act);
     getchar();
     
     if(act == 1)
@@ -50,10 +55,19 @@ void load_menu(Hero* hero)
                 break;
             }
         }
+        ms->missions_completed = hero->mission_completed[0]+hero->mission_completed[1]+hero->mission_completed[2];
+        ms->final_unlocked = hero->final_mission_unlocked;
+        ms->missions[0].status = hero->mission_completed[0] ? DONE : NOT_STARTED;
+        ms->missions[1].status = hero->mission_completed[1] ? DONE : NOT_STARTED;
+        ms->missions[2].status = hero->mission_completed[2] ? DONE : NOT_STARTED;
+        ms->missions[3].status = hero->final_mission_unlocked ? DONE : NOT_STARTED;
         printf("Loading...\n");
-        village_menu(hero);
+        if (!from_cheats)
+        {
+            village_menu(hero,ms);
+        }
     }
-    else if(act == 2)
+    else if(act == 2&&!from_cheats)
     {
         
         printf("Delete save? (yes/no): ");
@@ -69,7 +83,7 @@ void load_menu(Hero* hero)
         {
             printf("Cancel.\n");
         }
-        load_menu(hero);
+        load_menu(hero,ms, from_cheats);
     }
     else
     {

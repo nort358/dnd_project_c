@@ -31,7 +31,7 @@ typedef struct
 } MissionSystem;
 
 void mission_init(MissionSystem *s);
-void mission_display_menu(MissionSystem *s);
+int choose_mission(MissionSystem *s);
 int mission_select(MissionSystem *s, int choice, Hero *h);
 void mission_update_progress(MissionSystem *s, int add);
 

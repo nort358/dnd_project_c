@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../include/tools.h"
 
 void mission_init(MissionSystem *s)
 {
@@ -38,34 +39,47 @@ void mission_init(MissionSystem *s)
     s->final_unlocked = 0;
 }
 
-void mission_display_menu(MissionSystem *s)
+int choose_mission(MissionSystem *s)
 {
     printf("\n=== MISSIONS ===\n");
-    for(int i=0;i<3;i++)
-    {
-        printf("%d. %s\n", i+1, s->missions[i].name);
-        if(s->missions[i].status==0)
-            printf("   Not started\n");
-        else if(s->missions[i].status==1)
-            printf("   Doing: %d/%d\n",
-                s->missions[i].objectives_completed,
-                s->missions[i].objectives_required);
-        else
-            printf("   Done!\n");
+
+    int map[4];
+    int shown = 0;
+
+    for (int i = 0; i < 3; i++) {
+        if (s->missions[i].status == DONE) continue;
+
+        map[shown] = i;
+        printf("%d. %s\n", shown + 1, s->missions[i].name);
         printf("   %s\n\n", s->missions[i].objective);
+        shown++;
     }
-    printf("4. %s\n", s->missions[3].name);
-    if(s->final_unlocked) printf("   Ready\n");
-    else printf("   Locked (do 3 first)\n");
-    printf("\n0. Back\nPick [0-4]: ");
+    if (s->final_unlocked) {
+        map[shown] = 3;
+        printf("%d. %s\n", shown + 1, s->missions[3].name);
+        printf("   %s\n", s->missions[3].objective);
+        printf("   He is waiting you\n");
+        shown++;
+    }
+    printf("\n0. Back\nPick [0-%d]: ", shown);
+
+    int pick;
+    safe_scanf(&pick);
+    if ((pick == 0)||(pick==-1)) return -1;
+    if (pick < 1 || pick > shown) {
+        printf("Invalid choice!\n");
+        return -1;
+    }
+
+    return map[pick - 1];
 }
+
 
 int mission_select(MissionSystem *s, int ch, Hero *h)
 {
     (void)h;
-    if(ch==0) return -1;
-    if(ch<1||ch>4) { printf("Wrong\n"); return -1; }
-    int idx = ch-1;
+    if(ch<0||ch>4) { printf("Wrong\n"); return -1; }
+    int idx = ch;
     if(idx==3 && !s->final_unlocked) { printf("Do 3 first\n"); return -1; }
     s->missions[idx].status = 1;
     s->current_mission = idx;
@@ -82,7 +96,7 @@ void mission_update_progress(MissionSystem *s, int add)
     printf("Progress: %d/%d\n", s->missions[n].objectives_completed, s->missions[n].objectives_required);
     if(s->missions[n].objectives_completed >= s->missions[n].objectives_required)
     {
-        s->missions[n].status = 2;
+        s->missions[n].status = DONE;
         s->missions_completed++;
         s->current_mission = -1;
         printf("\n*** MISSION DONE! ***\n");

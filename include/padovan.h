@@ -1,5 +1,5 @@
-#ifndef SWORD_H
-#define SWORD_H
+#ifndef PADOVAN_H
+#define PADOVAN_H
 
 int isPadovan(int n);
 int isPadovanRec(int a, int b, int c, int n);
