@@ -214,7 +214,7 @@ int final_boss_fight()
     getchar();
 
     int p = 0, d = 0, r = 1;
-    while (p < 3 && d < 3 && r <= 6)
+    while (p < 3 && d < 3 && r <= 5)
     {
         printf("\nRound %d: You %d VS Dark %d\n", r, p, d);
         printf("Your move: ");
