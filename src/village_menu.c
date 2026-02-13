@@ -221,101 +221,168 @@ void village_menu(Hero *hero)
                     d = generate_dungeon(hero, CRYSTAL_CAVE);
 
                 printf("10 rooms\n\n");
-                shop_menu(hero);
-
+                int current_room = 0;
                 int gen = 0, vamp = 0, key = 0;
+                int mission_active = 1;
 
-                for (int i = 0; i < 10; i++)
+                while (mission_active && current_room < 10)
                 {
-                    printf("-- Room %d/10 --\n", i + 1);
-                    printf("see: %s\n", DUNGEON_TO_NAME[d.rooms[i].name]);
+                    printf("\n=== MISSION MENU ===\n");
+                    printf("1. Explore Dungeon Room (Room %d/10)\n", current_room + 1);
+                    printf("2. Shop\n");
+                    printf("3. Inventory\n");
+                    printf("4. Return to Village (Pay 50 Coins)\n");
+                    printf("Choose [1-4]: ");
 
-                    if (d.rooms[i].type == 0)
-                        printf("empty\n");
-                    else if (d.rooms[i].type == 1)
+                    int menu_choice;
+                    scanf("%d", &menu_choice);
+                    getchar();
+
+                    if (menu_choice == 1) // Explore
                     {
-                        if (d.rooms[i].name == ANCIENT_DRAGON)
-                        {
-                            int num = rand() % 500 + 1;
-                            printf("\nThe Dragon asks you: Is %d a Padovan number? (y/n): ", num);
+                        printf("\n-- Room %d/10 --\n", current_room + 1);
+                        printf("see: %s\n", DUNGEON_TO_NAME[d.rooms[current_room].name]);
 
+                        // Handle room based on type
+                        if (d.rooms[current_room].type == 0) // Empty
+                        {
+                            printf("empty\n");
+                        }
+                        else if (d.rooms[current_room].type == 1) // Enemy
+                        {
+                            // Padovan question for Ancient Dragon
+                            if (d.rooms[current_room].name == ANCIENT_DRAGON)
+                            {
+                                int num = rand() % 500 + 1;
+                                printf("\nThe Dragon asks you: Is %d a Padovan number? (y/n): ", num);
+
+                                char ans[10];
+                                fgets(ans, 10, stdin);
+                                ans[strcspn(ans, "\n")] = 0;
+
+                                int is_pad = isPadovan(num);
+
+                                if ((ans[0] == 'y' || ans[0] == 'Y') && is_pad)
+                                {
+                                    printf("Correct! The dragon spares you. No damage this round.\n");
+                                    d.rooms[current_room].damage = 0;
+                                }
+                                else if ((ans[0] == 'n' || ans[0] == 'N') && !is_pad)
+                                {
+                                    printf("Correct! The dragon spares you. No damage this round.\n");
+                                    d.rooms[current_room].damage = 0;
+                                }
+                                else
+                                {
+                                    printf("Wrong answer! The dragon attacks with full force!\n");
+                                }
+                            }
+
+                            int w = fight_enemy(hero, &d.rooms[current_room]);
+                            if (w == 0)
+                            {
+                                printf("\nback to main\n");
+                                return;
+                            }
+
+                            // Track mission progress
+                            if (d.rooms[current_room].name == ORC_GENERAL)
+                            {
+                                gen++;
+                                printf("Orc generals %d/3\n", gen);
+                                if (gen >= 3)
+                                {
+                                    printf("*** ROTTING SWAMP DONE ***\n");
+                                    hero->first_mission_completed = 1;
+                                    mission_update_progress(&ms, 1);
+                                }
+                            }
+                            if (d.rooms[current_room].name == GREAT_VAMPHIRE)
+                            {
+                                vamp = 1;
+                                printf("Vampire killed (1/2)\n");
+                                mission_update_progress(&ms, 1);
+                            }
+                            if (d.rooms[current_room].name == GURDIAN_DEMON)
+                            {
+                                key = 1;
+                                printf("Key got (1/2)\n");
+                                mission_update_progress(&ms, 1);
+                            }
+                            if (pick == 2 && vamp && key)
+                            {
+                                printf("*** HAUNTED MANSION DONE ***\n");
+                                hero->second_mission_completed = 1;
+                            }
+                        }
+                        else if (d.rooms[current_room].type == 2) // Trap
+                        {
+                            int dmg = d.rooms[current_room].damage;
+                            if (dmg == 0)
+                                dmg = rand() % 6 + 1;
+                            hero->life_points -= dmg;
+                            printf("trap -%d HP (now %d)\n", dmg, hero->life_points);
+                            if (hero->life_points <= 0)
+                            {
+                                printf("*** GAME OVER ***\n");
+                                return;
+                            }
+                        }
+
+                        current_room++; // Move to next room
+                        printf("Press Enter...");
+                        getchar();
+                    }
+                    else if (menu_choice == 2) // Shop
+                    {
+                        shop_menu(hero);
+                    }
+                    else if (menu_choice == 3) // Inventory
+                    {
+                        printf("\nHP:%d\nCoins:%d\n", hero->life_points, hero->coins);
+                        printf("Sword:%s\n", hero->sword ? "Y" : "N");
+                        printf("Armor:%s\n", hero->armor ? "Y" : "N");
+                        printf("Potions:%d\n", hero->health_potions);
+                    }
+                    else if (menu_choice == 4) // Return to Village
+                    {
+                        // Check if mission is complete
+                        if ((pick == 1 && gen >= 3) ||
+                            (pick == 2 && vamp && key) ||
+                            (pick == 3 && hero->third_mission_completed))
+                        {
+                            printf("Mission complete! Returning to village.\n");
+                            mission_active = 0;
+                        }
+                        else
+                        {
+                            printf("Mission not complete! Pay 50 coins? (y/n): ");
                             char ans[10];
                             fgets(ans, 10, stdin);
                             ans[strcspn(ans, "\n")] = 0;
 
-                            int is_pad = isPadovan(num);
-
-                            if ((ans[0] == 'y' || ans[0] == 'Y') && is_pad)
+                            if ((ans[0] == 'y' || ans[0] == 'Y') && hero->coins >= 50)
                             {
-                                printf("Correct! The dragon spares you. No damage this round.\n");
-                                d.rooms[i].damage = 0;
+                                hero->coins -= 50;
+                                printf("Paid 50 coins. Returning to village.\n");
+                                mission_active = 0;
                             }
-                            else if ((ans[0] == 'n' || ans[0] == 'N') && !is_pad)
+                            else if (hero->coins < 50)
                             {
-                                printf("Correct! The dragon spares you. No damage this round.\n");
-                                d.rooms[i].damage = 0;
+                                printf("Not enough coins! You need 50!\n");
                             }
                             else
                             {
-                                printf("Wrong answer! The dragon attacks with full force!\n");
+                                printf("Staying in dungeon.\n");
                             }
-                        }
-                        int w = fight_enemy(hero, &d.rooms[i]);
-                        if (w == 0)
-                        {
-                            printf("\nback to main\n");
-                            return;
-                        }
-
-                        if (d.rooms[i].name == ORC_GENERAL)
-                        {
-                            gen++;
-                            printf("Orc generals %d/3\n", gen);
-                            if (gen >= 3)
-                            {
-                                printf("*** ROTTING SWAMP DONE ***\n");
-                                hero->first_mission_completed = 1;
-                                mission_update_progress(&ms, 1);
-                                break;
-                            }
-                        }
-                        if (d.rooms[i].name == GREAT_VAMPHIRE)
-                        {
-                            vamp = 1;
-                            printf("Vampire killed (1/2)\n");
-                            mission_update_progress(&ms, 1);
-                        }
-                        if (d.rooms[i].name == GURDIAN_DEMON)
-                        {
-                            key = 1;
-                            printf("Key got (1/2)\n");
-                            mission_update_progress(&ms, 1);
-                        }
-                        if (pick == 2 && vamp && key)
-                        {
-                            printf("*** HAUNTED MANSION DONE ***\n");
-                            hero->second_mission_completed = 1;
-                            break;
                         }
                     }
-                    else if (d.rooms[i].type == 2)
+                    else
                     {
-                        int dmg = d.rooms[i].damage;
-                        if (dmg == 0)
-                            dmg = rand() % 6 + 1;
-                        hero->life_points -= dmg;
-                        printf("trap -%d HP (now %d)\n", dmg, hero->life_points);
-                        if (hero->life_points <= 0)
-                        {
-                            printf("*** GAME OVER ***\n");
-                            return;
-                        }
+                        printf("Invalid choice! Choose 1-4.\n");
                     }
-
-                    printf("Press Enter...");
-                    getchar();
-                    getchar();
                 }
+
                 printf("\nback to village\n");
             }
             break;
@@ -336,7 +403,7 @@ void village_menu(Hero *hero)
             save_game(hero);
             break;
         case 5:
-            printf("bye\n");
+            printf("bye bye :)\n");
             return;
         case 9:
             hero->coins += 1000;
