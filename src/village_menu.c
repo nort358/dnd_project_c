@@ -7,6 +7,7 @@
 #include "../include/save.h"
 #include "../include/dungeon.h"
 #include "../include/dungeon_name.h"
+#include "../include/padovan.h"
 
 // shop
 void shop_menu(Hero *h)
@@ -211,7 +212,7 @@ void village_menu(Hero *hero)
                 shop_menu(hero);
 
                 int gen = 0, vamp = 0, key = 0;
-                
+
                 for (int i = 0; i < 10; i++)
                 {
                     printf("-- Room %d/10 --\n", i + 1);
@@ -221,6 +222,32 @@ void village_menu(Hero *hero)
                         printf("empty\n");
                     else if (d.rooms[i].type == 1)
                     {
+                        if (d.rooms[i].name == ANCIENT_DRAGON)
+                        {
+                            int num = rand() % 500 + 1;
+                            printf("\nThe Dragon asks you: Is %d a Padovan number? (y/n): ", num);
+
+                            char ans[10];
+                            fgets(ans, 10, stdin);
+                            ans[strcspn(ans, "\n")] = 0;
+
+                            int is_pad = isPadovan(num);
+
+                            if ((ans[0] == 'y' || ans[0] == 'Y') && is_pad)
+                            {
+                                printf("Correct! The dragon spares you. No damage this round.\n");
+                                d.rooms[i].damage = 0;
+                            }
+                            else if ((ans[0] == 'n' || ans[0] == 'N') && !is_pad)
+                            {
+                                printf("Correct! The dragon spares you. No damage this round.\n");
+                                d.rooms[i].damage = 0;
+                            }
+                            else
+                            {
+                                printf("Wrong answer! The dragon attacks with full force!\n");
+                            }
+                        }
                         int w = fight_enemy(hero, &d.rooms[i]);
                         if (w == 0)
                         {
@@ -308,7 +335,8 @@ void village_menu(Hero *hero)
         default:
             printf("wrong input!!\n");
         }
-        printf("\nPress Enter...");
+        printf("Press Enter...");
         getchar();
     }
+    printf("\nback to village\n");
 }
