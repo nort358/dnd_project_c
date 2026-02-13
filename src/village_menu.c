@@ -56,36 +56,48 @@ void shop_menu(Hero *h)
 // fight
 int fight_enemy(Hero *h, Room *r)
 {
-    printf("\n--- FIGHT ---\n");
-    printf("The hero encounters %s and the fight begins .\n", DUNGEON_TO_NAME[r->name]);
+    printf("\nThe hero encounters a %s and the fight begins.\n", DUNGEON_TO_NAME[r->name]);
+
     while (h->life_points > 0)
     {
-        int a = rand() % 6 + 1;
+        printf("\nA dice is rolled to determine the hero's attack\n");
+
+        int dice = rand() % 6 + 1;
+        int attack = dice;
         if (h->sword)
-            a++;
-        printf("roll %d", a - (h->sword ? 1 : 0));
-        if (h->sword)
-            printf("+1 = %d", a);
-        printf("\n");
-        if (a >= r->fatal_strike)
+            attack++;
+
+        printf("The result: %d.\n", dice);
+
+        if (attack > r->fatal_strike)
         {
-            printf("VICTORY!\n");
+            printf("Attack enough to defeat the %s (%d > Fatal Strike=%d).\n",
+                   DUNGEON_TO_NAME[r->name], attack, r->fatal_strike);
+            printf("The %s is defeated. ", DUNGEON_TO_NAME[r->name]);
+            printf("The hero remains with %d life points, and receives %d coins.\n",
+                   h->life_points, r->reward_coins);
             h->coins += r->reward_coins;
-            printf("+%d coins (now %d)\n", r->reward_coins, h->coins);
-            return 1;
+            return 1; // victory
         }
         else
         {
-            int d = r->damage;
+            printf("Attack not enough to defeat the %s (%d < Fatal Strike=%d).\n",
+                   DUNGEON_TO_NAME[r->name], attack, r->fatal_strike);
+
+            int damage = r->damage;
             if (h->armor)
-                d--;
-            if (d < 1)
-                d = 1;
-            h->life_points -= d;
-            printf("hit -%d HP (left %d)\n", d, h->life_points);
+                damage--;
+            if (damage < 1)
+                damage = 1;
+
+            printf("The %s deals %d damage to the hero. ", DUNGEON_TO_NAME[r->name], damage);
+            h->life_points -= damage;
+            printf("The hero remains with %d life points.\n", h->life_points);
+
             if (h->life_points <= 0)
             {
-                printf("GAME OVER\n");
+                printf("\n*** GAME OVER ***\n");
+                printf("You have been defeated!\n");
                 return 0;
             }
         }
